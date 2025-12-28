@@ -3,29 +3,74 @@
 # Refer to /README.md for more information.
 
 # Docker Compose File Format Version.
-version: "3.7"
+# version: "3.7"
 
 services:
   server:
+    container_name: lottery_server
     build:
       context: ./server
+      dockerfile: Dockerfile
+    command: npm run dev
     volumes:
       - ./server:/usr/src/app
-      - /usr/src/app/node_modules # Required to persist node_modules between container stop/starts.
+      - /usr/src/app/node_modules
     ports:
-      - 5000:5000
-    env_file: ./server/.env
+      - "5000:5000"
+    env_file:
+      - ./server/.env
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - lottery_net
 
   client:
+    container_name: lottery_client
     build:
       context: ./client
-    # This will force server service to build and start before client.
-    depends_on:
-      - server
+      dockerfile: Dockerfile
+    command: npm start
     volumes:
       - ./client:/usr/src/app
-      - /usr/src/app/node_modules # Required to persist node_modules between container stop/starts.
+      - /usr/src/app/node_modules
     ports:
-      - 3000:3000
+      - "3000:3000"
     environment:
       CHOKIDAR_USEPOLLING: "true"
+      REACT_APP_API_URL: http://server:5000
+    depends_on:
+      - server
+    networks:
+      - lottery_net
+
+  postgres:
+    image: postgres:15
+    container_name: lottery_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: database.js
+      POSTGRES_USER: lottery_user
+      POSTGRES_PASSWORD: lottery_pass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - lottery_net
+
+  redis:
+    image: redis:7
+    container_name: lottery_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - lottery_net
+
+volumes:
+  pgdata:
+
+networks:
+  lottery_net:
+    driver: bridge

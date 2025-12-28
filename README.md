@@ -106,3 +106,26 @@ ERROR: Encountered errors while bringing up the project.
 
 - Restart Docker Desktop.
 - Run `docker-compose up` and the error shouldn't occur now.
+
+
+# Remove images
+docker images
+docker rmi lottery_check-server:latest
+docker rmi lottery_check-client:latest
+
+# Docker build 
+docker compose build --no-cache
+docker compose -d up
+docker compose down
+
+# Check log
+docker logs lottery_server
+docker logs lottery_client
+docker logs lottery_postgres
+docker logs lottery_redis
+
+npm install --save-dev nodemon
+
+# Migrate database
+npx sequelize-cli db:migrate --config src/config/config.js --migrations-path src/migrations
+

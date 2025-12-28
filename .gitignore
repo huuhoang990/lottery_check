@@ -1,4 +1,4 @@
 /node_modules
 .DS_Store
 .env
-server/ocr_key/
+server/ocr_key/*.json

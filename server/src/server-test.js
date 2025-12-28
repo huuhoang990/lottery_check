@@ -26,10 +26,10 @@ app.get("/test", (req, res) => {
   });
 });
 
-app.get("/test-ocr", async (req, res) => {
+app.post("/test-ocr", async (req, res) => {
   try {
-    const imagePath = path.join(__dirname, 'sample3.png');
-    console.log('Đang quét ảnh:', imagePath);
+    const imagePath = path.join(__dirname, '..', 'sample3.png');
+
     // Thực hiện nhận diện văn bản (OCR)
     const [result] = await client.textDetection(imagePath);
     const detections = result.textAnnotations;
