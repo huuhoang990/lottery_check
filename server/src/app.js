@@ -18,6 +18,7 @@ app.use(express.urlencoded({ extended: true }));
  */
 app.use('/api/ocr', require('./modules/ocr/ocr.route'));
 app.use('/api/draw', require('./modules/draw/draw.route'));
+app.use('/api/ticket-checker', require('./modules/ticket-checker/ ticket-checker.route'));
 
 /**
  * ======================
