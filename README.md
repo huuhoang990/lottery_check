@@ -117,6 +117,8 @@ docker rmi lottery_check-client:latest
 docker compose build --no-cache
 docker compose -d up
 docker compose down
+docker compose up --build -d
+docker exec -it lottery_server env | grep DB_HOST
 
 # Check log
 docker logs lottery_server
@@ -128,4 +130,44 @@ npm install --save-dev nodemon
 
 # Migrate database
 npx sequelize-cli db:migrate --config src/config/config.js --migrations-path src/migrations
+npx sequelize-cli seed:generate --name seed-regions
+npx sequelize-cli db:seed:all --config src/config/config.js
+
+# remove all
+npx sequelize-cli db:migrate:undo:all \
+  --config src/config/config.js \
+  --migrations-path src/migrations
+
+# backup 
+docker exec lottery_postgres pg_dump -U lottery_user lottery_user > backup.sql
+
+# create file name
+npx sequelize-cli migration:generate \
+  --name create-lottery-regions \
+  --migrations-path src/migrations
+
+npx sequelize-cli migration:generate \
+  --name create-lottery-provinces \
+  --migrations-path src/migrations
+
+npx sequelize-cli migration:generate \
+  --name create-lottery-draws \
+  --migrations-path src/migrations
+
+npx sequelize-cli migration:generate \
+  --name create-lottery-prizes \
+  --migrations-path src/migrations
+
+npx sequelize-cli migration:generate \
+  --name create-lottery-numbers \
+  --migrations-path src/migrations
+  
+# test models loaded
+node -e "require('./src/models'); console.log('Models loaded OK')"
+
+sudo sysctl -w vm.overcommit_memory=1
+
+nvm install 20
+nvm use 20
+
 

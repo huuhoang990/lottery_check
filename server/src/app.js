@@ -1,19 +1,56 @@
 require('dotenv').config();
 const express = require('express');
-const bodyParser = require('body-parser');
-const { sequelize } = require('./models');
-
-// Import routes
-// const lotteryRoutes = require('./modules/lottery/lottery.routes');
-const ocrRoutes = require('./modules/ocr/ocr.route');
 
 const app = express();
 
-// Middleware
-app.use(bodyParser.json());
+/**
+ * ======================
+ * Global Middlewares
+ * ======================
+ */
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Routes
-// app.use('/api/lottery', lotteryRoutes);
-app.use('/api/ocr', ocrRoutes);
+/**
+ * ======================
+ * Routes
+ * ======================
+ */
+app.use('/api/ocr', require('./modules/ocr/ocr.route'));
+app.use('/api/draw', require('./modules/draw/draw.route'));
 
-module.exports = app; // ✅ export trực tiếp instance app
+/**
+ * ======================
+ * 404 Handler
+ * ======================
+ */
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'API endpoint not found',
+    path: req.originalUrl,
+    timestamp: new Date().toISOString()
+  });
+});
+
+/**
+ * ======================
+ * Global Error Handler
+ * ======================
+ */
+app.use((err, req, res, next) => {
+  console.error('[ERROR]', err);
+
+  const status = err.status || 500;
+
+  res.status(status).json({
+    success: false,
+    message: err.message || 'Internal Server Error',
+    ...(process.env.NODE_ENV !== 'production' && {
+      stack: err.stack
+    }),
+    timestamp: new Date().toISOString()
+  });
+});
+
+module.exports = app;

@@ -1,20 +1,23 @@
+const fs = require('fs');
+const path = require('path');
 const sequelize = require('../config/database');
-const User = require('./user');
-const LotteryTicket = require('./lottery_ticket');
-const LotteryDraw = require('./lottery_draw');
-const Prize = require('./prize');
 
-// Relation ship
-User.hasMany(LotteryTicket, { foreignKey: 'user_id' });
-LotteryTicket.belongsTo(User, { foreignKey: 'user_id' });
+const db = {};
 
-LotteryDraw.hasMany(LotteryTicket, { foreignKey: 'draw_date', sourceKey: 'draw_date' });
-LotteryTicket.belongsTo(LotteryDraw, { foreignKey: 'draw_date', targetKey: 'draw_date' });
+fs.readdirSync(__dirname)
+  .filter(file => file !== 'index.js')
+  .forEach(file => {
+    const model = require(path.join(__dirname, file));
+    db[model.name] = model;
+  });
 
-LotteryDraw.hasMany(Prize, { foreignKey: 'draw_id' });
-Prize.belongsTo(LotteryDraw, { foreignKey: 'draw_id' });
+Object.values(db).forEach(model => {
+  if (model.associate) {
+    model.associate(db);
+  }
+});
 
-LotteryTicket.hasOne(Prize, { foreignKey: 'ticket_id' });
-Prize.belongsTo(LotteryTicket, { foreignKey: 'ticket_id' });
+db.sequelize = sequelize;
+db.Sequelize = require('sequelize');
 
-module.exports = { sequelize, User, LotteryTicket, LotteryDraw, Prize };
+module.exports = db;

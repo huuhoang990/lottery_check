@@ -1,13 +1,40 @@
 #  Dockerfile for Node Express Backend
-FROM node:20-alpine
+FROM node:20-slim
+
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    fonts-liberation \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libcups2 \
+    libdbus-1-3 \
+    libdrm2 \
+    libgbm1 \
+    libgtk-3-0 \
+    libnspr4 \
+    libnss3 \
+    libx11-xcb1 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    xdg-utils \
+    wget \
+    git \
+    --no-install-recommends && rm -rf /var/lib/apt/lists/*
+
+# Install Chromium
+RUN apt-get update && apt-get install -y chromium && rm -rf /var/lib/apt/lists/*
 
 # Working directory be app
 WORKDIR /usr/src/app
 
 COPY package*.json ./
 
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false
+
 # Installing dependencies.
-RUN npm i
+RUN npm ci
 
 COPY . .
 

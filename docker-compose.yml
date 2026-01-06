@@ -21,35 +21,35 @@ services:
       - ./server/.env
     depends_on:
       - postgres
-      - redis
+      # - redis
     networks:
       - lottery_net
 
-  client:
-    container_name: lottery_client
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-    command: npm start
-    volumes:
-      - ./client:/usr/src/app
-      - /usr/src/app/node_modules
-    ports:
-      - "3000:3000"
-    environment:
-      CHOKIDAR_USEPOLLING: "true"
-      REACT_APP_API_URL: http://server:5000
-    depends_on:
-      - server
-    networks:
-      - lottery_net
+  # client:
+  #   container_name: lottery_client
+  #   build:
+  #     context: ./client
+  #     dockerfile: Dockerfile
+  #   command: npm start
+  #   volumes:
+  #     - ./client:/usr/src/app
+  #     - /usr/src/app/node_modules
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     CHOKIDAR_USEPOLLING: "true"
+  #     REACT_APP_API_URL: http://server:5000
+  #   depends_on:
+  #     - server
+  #   networks:
+  #     - lottery_net
 
   postgres:
     image: postgres:15
     container_name: lottery_postgres
-    restart: unless-stopped
+    restart: always
     environment:
-      POSTGRES_DB: database.js
+      POSTGRES_DB: lottery
       POSTGRES_USER: lottery_user
       POSTGRES_PASSWORD: lottery_pass
     volumes:
@@ -62,7 +62,7 @@ services:
   redis:
     image: redis:7
     container_name: lottery_redis
-    restart: unless-stopped
+    restart: always
     ports:
       - "6379:6379"
     networks:
