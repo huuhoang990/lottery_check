@@ -21,12 +21,20 @@ exports.checkTicket = async ({ province_name, draw_date, ticket_number }) => {
         include: [
           {
             model: LotteryPrize,
-            include: [LotteryNumber]
+            as: 'prizes',
+            include: [
+              {
+                model: LotteryNumber,
+                as: 'numbers' // Added alias to match association
+              }
+            ]
           }
         ]
       }
     ]
   });
+
+  console.log(provinceRow);
 
   if (!provinceRow) {
     return {
@@ -46,8 +54,8 @@ exports.checkTicket = async ({ province_name, draw_date, ticket_number }) => {
   // 2️⃣ Compare ticket with winning numbers (right-to-left)
   const matches = [];
 
-  for (const prize of draw.LotteryPrizes) {
-    for (const num of prize.LotteryNumbers) {
+  for (const prize of draw.prizes) {
+    for (const num of prize.numbers) {
       if (ticket.endsWith(num.number)) {
         matches.push({
           prize_code: prize.prize_code,

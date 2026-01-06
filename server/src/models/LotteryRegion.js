@@ -15,7 +15,8 @@ const LotteryRegion = sequelize.define('LotteryRegion', {
 
 LotteryRegion.associate = models => {
   LotteryRegion.hasMany(models.LotteryProvince, {
-    foreignKey: 'region_id'
+    foreignKey: 'region_id',
+    as: 'provinces'
   });
 };
 

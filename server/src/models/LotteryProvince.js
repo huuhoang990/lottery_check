@@ -19,6 +19,11 @@ LotteryProvince.associate = models => {
   LotteryProvince.belongsTo(models.LotteryRegion, {
     foreignKey: 'region_id'
   });
+
+  LotteryProvince.hasMany(models.LotteryDraw, {
+    foreignKey: 'province_id'
+  });
 };
+
 
 module.exports = LotteryProvince;
