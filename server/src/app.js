@@ -53,4 +53,12 @@ app.use((err, req, res, next) => {
   });
 });
 
+/** ======================
+ * Scheduled Jobs
+ * ======================
+ */
+// Load scheduled jobs
+require('./jobs/lotterySync.job');
+
+// Export the app for server.js or testing
 module.exports = app;
