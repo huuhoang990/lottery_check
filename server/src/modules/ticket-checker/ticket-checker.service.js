@@ -8,12 +8,12 @@ const {
 /**
  * Check lottery ticket against database results
  */
-exports.checkTicket = async ({ province, draw_date, ticket_number }) => {
+exports.checkTicket = async ({ province_name, draw_date, ticket_number }) => {
   const ticket = String(ticket_number).trim();
 
   // 1️⃣ Find province + draw + prizes + numbers
   const provinceRow = await LotteryProvince.findOne({
-    where: { name: province },
+    where: { name: province_name },
     include: [
       {
         model: LotteryDraw,
